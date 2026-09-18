@@ -2,15 +2,22 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Private Memories - Kunal Moments</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+        href="style.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
 </head>
+
 
 <body>
 
@@ -34,11 +41,14 @@
 
         <br><br>
 
-        <button onclick="login()">Login</button>
+        <button id="loginButton">
+            Login
+        </button>
 
         <p id="message"></p>
 
     </div>
+
 
     <script>
 
@@ -46,44 +56,61 @@
             "https://gtbrnbpqyjywtdxxvois.supabase.co";
 
         const SUPABASE_KEY =
-            "";
-sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4
-        const supabaseClient =
-            supabase.createClient(
+            "sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4";
+
+
+        const client =
+            window.supabase.createClient(
                 SUPABASE_URL,
                 SUPABASE_KEY
             );
 
 
-        async function login() {
+        const loginButton =
+            document.getElementById("loginButton");
 
-            const email =
-                document.getElementById("email").value;
-
-            const password =
-                document.getElementById("password").value;
-
-            const message =
-                document.getElementById("message");
-
-            message.textContent =
-                "Logging in...";
+        const message =
+            document.getElementById("message");
 
 
-            try {
+        loginButton.addEventListener(
+            "click",
+            async function () {
 
-                const { data, error } =
-                    await supabaseClient.auth
-                    .signInWithPassword({
+                const email =
+                    document.getElementById("email").value.trim();
+
+                const password =
+                    document.getElementById("password").value;
+
+
+                if (!email || !password) {
+
+                    message.textContent =
+                        "Please enter email and password.";
+
+                    return;
+                }
+
+
+                message.textContent =
+                    "Logging in...";
+
+
+                const result =
+                    await client.auth.signInWithPassword({
+
                         email: email,
                         password: password
+
                     });
 
 
-                if (error) {
+                if (result.error) {
 
                     message.textContent =
-                        "ERROR: " + error.message;
+                        "ERROR: " +
+                        result.error.message;
 
                     return;
                 }
@@ -92,16 +119,12 @@ sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4
                 message.textContent =
                     "LOGIN SUCCESSFUL!";
 
-            } catch (err) {
-
-                message.textContent =
-                    "ERROR: " + err.message;
             }
-
-        }
+        );
 
     </script>
 
 </body>
 
-</html>                
+</html>
+                
