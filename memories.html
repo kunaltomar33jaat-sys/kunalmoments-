@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Memories - Kunal Moments</title>
+    <title>Private Memories - Kunal Moments</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -14,41 +18,73 @@
 
         <h1>PRIVATE MEMORIES</h1>
 
-        <p>Enter the password to continue.</p>
+        <p>Login to view your memories.</p>
 
-        <input type="password" placeholder="Enter password">
+        <input type="email" id="email" placeholder="Email">
+
+        <br>
+
+        <input type="password" id="password" placeholder="Password">
 
         <br><br>
 
-        <button onclick="unlockMemories()">Unlock Memories</button>
+        <button onclick="login()">Login</button>
 
-        <div class="gallery">
-
-            <div class="memory-card">
-                <div class="placeholder">PHOTO</div>
-
-                <h2>School Memories</h2>
-
-                <p>A moment worth remembering.</p>
-            </div>
-
-            <div class="memory-card">
-                <div class="placeholder">VIDEO</div>
-
-                <h2>Friends</h2>
-
-                <p>Good times with good people.</p>
-            </div>
-
-        </div>
+        <p id="message"></p>
 
     </div>
 
     <script>
-        function unlockMemories() {
-            alert("Password system will be connected securely later.");
+
+        const SUPABASE_URL = https://gtbrnbpqyjywtdxxvois.supabase.co/rest/v1/
+
+        const SUPABASE_KEY = sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4
+
+        const supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+        async function login() {
+
+            const email =
+                document.getElementById("email").value;
+
+            const password =
+                document.getElementById("password").value;
+
+            const message =
+                document.getElementById("message");
+
+            message.textContent = "Logging in...";
+
+            try {
+
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                if (error) {
+                    message.textContent =
+                        "ERROR: " + error.message;
+                    return;
+                }
+
+                message.textContent =
+                    "LOGIN SUCCESSFUL!";
+
+            } catch (err) {
+
+                message.textContent =
+                    "ERROR: " + err.message;
+
+            }
         }
+
     </script>
 
 </body>
+
 </html>
