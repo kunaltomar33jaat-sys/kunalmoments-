@@ -20,11 +20,17 @@
 
         <p>Login to view your memories.</p>
 
-        <input type="email" id="email" placeholder="Email">
+        <input
+            type="email"
+            id="email"
+            placeholder="Email">
 
         <br>
 
-        <input type="password" id="password" placeholder="Password">
+        <input
+            type="password"
+            id="password"
+            placeholder="Password">
 
         <br><br>
 
@@ -36,14 +42,18 @@
 
     <script>
 
-        const SUPABASE_URL = https://gtbrnbpqyjywtdxxvois.supabase.co";
+        const SUPABASE_URL =
+            "https://gtbrnbpqyjywtdxxvois.supabase.co";
 
-        const SUPABASE_KEY = "sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4"
+        const SUPABASE_KEY =
+            "";
+sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4
+        const supabaseClient =
+            supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
 
-        const supabaseClient = 
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
 
         async function login() {
 
@@ -56,21 +66,28 @@
             const message =
                 document.getElementById("message");
 
-            message.textContent = "Logging in...";
+            message.textContent =
+                "Logging in...";
+
 
             try {
 
                 const { data, error } =
-                    await supabaseClient.auth.signInWithPassword({
+                    await supabaseClient.auth
+                    .signInWithPassword({
                         email: email,
                         password: password
                     });
 
+
                 if (error) {
+
                     message.textContent =
                         "ERROR: " + error.message;
+
                     return;
                 }
+
 
                 message.textContent =
                     "LOGIN SUCCESSFUL!";
@@ -79,7 +96,12 @@
 
                 message.textContent =
                     "ERROR: " + err.message;
-
             }
+
         }
-        
+
+    </script>
+
+</body>
+
+</html>                
