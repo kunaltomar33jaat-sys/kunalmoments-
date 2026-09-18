@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Admin Panel - Kunal Moments</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+        href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
+
 
 <body>
 
@@ -18,29 +28,247 @@
 
         <br>
 
-        <a href="index.html" class="btn">Back to Home</a>
+        <a href="index.html"
+            class="btn">
+            Back to Home
+        </a>
+
 
         <div class="admin-box">
 
+            <input
+                type="email"
+                id="adminEmail"
+                placeholder="Admin Email">
+
+            <br><br>
+
+
+            <input
+                type="password"
+                id="adminPassword"
+                placeholder="Admin Password">
+
+            <br><br>
+
+
+            <button onclick="adminLogin()">
+                Admin Login
+            </button>
+
+            <p id="adminMessage"></p>
+
+
+            <hr>
+
+
             <h2>Add New Memory</h2>
 
-            <input type="text" placeholder="Memory title">
+
+            <input
+                type="text"
+                id="memoryTitle"
+                placeholder="Memory title">
 
             <br><br>
 
-            <input type="text" placeholder="Caption">
+
+            <input
+                type="text"
+                id="memoryCaption"
+                placeholder="Caption">
 
             <br><br>
 
-            <input type="file" accept="image/*,video/*">
+
+            <input
+                type="file"
+                id="memoryFile"
+                accept="image/*,video/*">
 
             <br><br>
 
-            <button>Add Memory</button>
+
+            <button onclick="addMemory()">
+                Add Memory
+            </button>
+
+            <p id="uploadMessage"></p>
 
         </div>
 
     </div>
 
+
+    <script>
+
+
+        const SUPABASE_URL =
+            "https://gtbrnbpqyjywtdxxvois.supabase.co";
+
+
+        const SUPABASE_KEY =
+            "sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4";
+
+
+        const supabaseClient =
+            supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+
+        async function adminLogin() {
+
+            const email =
+                document.getElementById(
+                    "adminEmail"
+                ).value;
+
+            const password =
+                document.getElementById(
+                    "adminPassword"
+                ).value;
+
+            const message =
+                document.getElementById(
+                    "adminMessage"
+                );
+
+
+            message.textContent =
+                "Logging in...";
+
+
+            const { error } =
+                await supabaseClient.auth
+                .signInWithPassword({
+
+                    email: email,
+                    password: password
+
+                });
+
+
+            if (error) {
+
+                message.textContent =
+                    "ERROR: " +
+                    error.message;
+
+                return;
+            }
+
+
+            message.textContent =
+                "ADMIN LOGIN SUCCESSFUL!";
+
+        }
+
+
+        async function addMemory() {
+
+            const uploadMessage =
+                document.getElementById(
+                    "uploadMessage"
+                );
+
+
+            const title =
+                document.getElementById(
+                    "memoryTitle"
+                ).value;
+
+
+            const caption =
+                document.getElementById(
+                    "memoryCaption"
+                ).value;
+
+
+            const file =
+                document.getElementById(
+                    "memoryFile"
+                ).files[0];
+
+
+            if (!file) {
+
+                uploadMessage.textContent =
+                    "Please choose a file.";
+
+                return;
+            }
+
+
+            if (!title) {
+
+                uploadMessage.textContent =
+                    "Please enter a memory title.";
+
+                return;
+            }
+
+
+            uploadMessage.textContent =
+                "Uploading...";
+
+
+            const filePath =
+                crypto.randomUUID() +
+                "-" +
+                file.name;
+
+
+            const { error: uploadError } =
+                await supabaseClient.storage
+                .from("memories")
+                .upload(
+                    filePath,
+                    file
+                );
+
+
+            if (uploadError) {
+
+                uploadMessage.textContent =
+                    "UPLOAD ERROR: " +
+                    uploadError.message;
+
+                return;
+            }
+
+
+            const { error: databaseError } =
+                await supabaseClient
+                .from("memories")
+                .insert({
+
+                    title: title,
+                    caption: caption,
+                    file_path: filePath
+
+                });
+
+
+            if (databaseError) {
+
+                uploadMessage.textContent =
+                    "DATABASE ERROR: " +
+                    databaseError.message;
+
+                return;
+            }
+
+
+            uploadMessage.textContent =
+                "MEMORY SAVED SUCCESSFULLY!";
+
+        }
+
+
+    </script>
+
 </body>
+
 </html>
