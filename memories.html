@@ -118,10 +118,72 @@
 
                 message.textContent =
                     "LOGIN SUCCESSFUL!";
-
+loadMemories();
             }
         );
+const gallery = document.createElement("div");
 
+gallery.className = "gallery";
+
+document
+    .querySelector(".container")
+    .appendChild(gallery);
+
+
+async function loadMemories() {
+
+    gallery.innerHTML = "Loading memories...";
+
+    const { data, error } =
+        await client
+            .from("memories")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            });
+
+    if (error) {
+
+        gallery.innerHTML =
+            "ERROR: " + error.message;
+
+        return;
+    }
+
+
+    gallery.innerHTML = "";
+
+
+    for (const memory of data) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "memory-card";
+
+
+        const title =
+            document.createElement("h2");
+
+        title.textContent =
+            memory.title || "Untitled";
+
+
+        const caption =
+            document.createElement("p");
+
+        caption.textContent =
+            memory.caption || "";
+
+
+        card.appendChild(title);
+
+        card.appendChild(caption);
+
+        gallery.appendChild(card);
+    }
+}
     </script>
 
 </body>
