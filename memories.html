@@ -237,7 +237,25 @@
                     "block";
 
 
+                const title =
+                    document.createElement("h2");
+
+                title.textContent =
+                    file.name;
+
+
+                const caption =
+                    document.createElement("p");
+
+                caption.textContent =
+                    "A special Kunal Moment ❤️";
+
+
                 card.appendChild(image);
+
+                card.appendChild(title);
+
+                card.appendChild(caption);
 
                 gallery.appendChild(card);
 
@@ -249,4 +267,4 @@
 
 </body>
 
-</html>    
+</html>                    
