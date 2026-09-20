@@ -13,7 +13,8 @@
     <link rel="stylesheet"
         href="style.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
 
 </head>
 
@@ -43,14 +44,12 @@
 
             <br><br>
 
-
             <input
                 type="password"
                 id="adminPassword"
                 placeholder="Admin Password">
 
             <br><br>
-
 
             <button onclick="adminLogin()">
                 Admin Login
@@ -102,17 +101,15 @@
 
     <script>
 
-
         const SUPABASE_URL =
             "https://gtbrnbpqyjywtdxxvois.supabase.co";
-
 
         const SUPABASE_KEY =
             "sb_publishable_pbRIkluFEhLo9t8rBM7D9w_YG6q78o4";
 
 
-        const supabaseClient =
-            supabase.createClient(
+        const client =
+            window.supabase.createClient(
                 SUPABASE_URL,
                 SUPABASE_KEY
             );
@@ -121,14 +118,15 @@
         async function adminLogin() {
 
             const email =
-                document.getElementById(
-                    "adminEmail"
-                ).value;
+                document
+                    .getElementById("adminEmail")
+                    .value
+                    .trim();
 
             const password =
-                document.getElementById(
-                    "adminPassword"
-                ).value;
+                document
+                    .getElementById("adminPassword")
+                    .value;
 
             const message =
                 document.getElementById(
@@ -136,13 +134,21 @@
                 );
 
 
+            if (!email || !password) {
+
+                message.textContent =
+                    "Please enter email and password.";
+
+                return;
+            }
+
+
             message.textContent =
                 "Logging in...";
 
 
             const { error } =
-                await supabaseClient.auth
-                .signInWithPassword({
+                await client.auth.signInWithPassword({
 
                     email: email,
                     password: password
@@ -175,21 +181,23 @@
 
 
             const title =
-                document.getElementById(
-                    "memoryTitle"
-                ).value;
+                document
+                    .getElementById("memoryTitle")
+                    .value
+                    .trim();
 
 
             const caption =
-                document.getElementById(
-                    "memoryCaption"
-                ).value;
+                document
+                    .getElementById("memoryCaption")
+                    .value
+                    .trim();
 
 
             const file =
-                document.getElementById(
-                    "memoryFile"
-                ).files[0];
+                document
+                    .getElementById("memoryFile")
+                    .files[0];
 
 
             if (!file) {
@@ -221,12 +229,12 @@
 
 
             const { error: uploadError } =
-                await supabaseClient.storage
-                .from("memories")
-                .upload(
-                    filePath,
-                    file
-                );
+                await client.storage
+                    .from("memories")
+                    .upload(
+                        filePath,
+                        file
+                    );
 
 
             if (uploadError) {
@@ -240,15 +248,17 @@
 
 
             const { error: databaseError } =
-                await supabaseClient
-                .from("memories")
-                .insert({
+                await client
+                    .from("memories")
+                    .insert({
 
-                    title: title,
-                    caption: caption,
-                    file_path: filePath
+                        title: title,
 
-                });
+                        caption: caption,
+
+                        file_path: filePath
+
+                    });
 
 
             if (databaseError) {
@@ -264,8 +274,22 @@
             uploadMessage.textContent =
                 "MEMORY SAVED SUCCESSFULLY!";
 
-        }
 
+            document
+                .getElementById("memoryTitle")
+                .value = "";
+
+
+            document
+                .getElementById("memoryCaption")
+                .value = "";
+
+
+            document
+                .getElementById("memoryFile")
+                .value = "";
+
+        }
 
     </script>
 
