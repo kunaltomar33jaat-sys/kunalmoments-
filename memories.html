@@ -47,6 +47,10 @@
 
         <p id="message"></p>
 
+        <div id="gallery"
+            class="gallery">
+        </div>
+
     </div>
 
 
@@ -72,16 +76,24 @@
         const message =
             document.getElementById("message");
 
+        const gallery =
+            document.getElementById("gallery");
+
 
         loginButton.addEventListener(
             "click",
             async function () {
 
                 const email =
-                    document.getElementById("email").value.trim();
+                    document
+                        .getElementById("email")
+                        .value
+                        .trim();
 
                 const password =
-                    document.getElementById("password").value;
+                    document
+                        .getElementById("password")
+                        .value;
 
 
                 if (!email || !password) {
@@ -97,96 +109,144 @@
                     "Logging in...";
 
 
-                const result =
-                    await client.auth.signInWithPassword({
+                try {
 
-                        email: email,
-                        password: password
+                    const { error } =
+                        await client.auth.signInWithPassword({
 
-                    });
+                            email: email,
+                            password: password
+
+                        });
 
 
-                if (result.error) {
+                    if (error) {
+
+                        message.textContent =
+                            "ERROR: " +
+                            error.message;
+
+                        return;
+                    }
+
+
+                    message.textContent =
+                        "LOGIN SUCCESSFUL!";
+
+
+                    await loadMemories();
+
+
+                } catch (error) {
 
                     message.textContent =
                         "ERROR: " +
-                        result.error.message;
+                        error.message;
 
-                    return;
+                }
+
+            }
+        );
+
+
+        async function loadMemories() {
+
+            gallery.innerHTML =
+                "<p>Loading memories...</p>";
+
+
+            const { data, error } =
+                await client.storage
+                    .from("memories")
+                    .list();
+
+
+            if (error) {
+
+                gallery.innerHTML =
+                    "<p>STORAGE ERROR: " +
+                    error.message +
+                    "</p>";
+
+                return;
+            }
+
+
+            if (!data || data.length === 0) {
+
+                gallery.innerHTML =
+                    "<p>No memories found.</p>";
+
+                return;
+            }
+
+
+            gallery.innerHTML = "";
+
+
+            for (const file of data) {
+
+                if (!file.name) {
+                    continue;
                 }
 
 
-                message.textContent =
-                    "LOGIN SUCCESSFUL!";
-loadMemories();
+                const { data: signedData, error: signedError } =
+                    await client.storage
+                        .from("memories")
+                        .createSignedUrl(
+                            file.name,
+                            3600
+                        );
+
+
+                if (signedError) {
+                    continue;
+                }
+
+
+                if (!signedData) {
+                    continue;
+                }
+
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "memory-card";
+
+
+                const image =
+                    document.createElement("img");
+
+                image.src =
+                    signedData.signedUrl;
+
+                image.alt =
+                    "Kunal Moment";
+
+
+                image.style.width =
+                    "100%";
+
+                image.style.borderRadius =
+                    "10px";
+
+                image.style.display =
+                    "block";
+
+
+                card.appendChild(image);
+
+                gallery.appendChild(card);
+
             }
-        );
-const gallery = document.createElement("div");
 
-gallery.className = "gallery";
+        }
 
-document
-    .querySelector(".container")
-    .appendChild(gallery);
-
-
-async function loadMemories() {
-
-    gallery.innerHTML = "Loading memories...";
-
-    const { data, error } =
-        await client
-            .from("memories")
-            .select("*")
-            .order("created_at", {
-                ascending: false
-            });
-
-    if (error) {
-
-        gallery.innerHTML =
-            "ERROR: " + error.message;
-
-        return;
-    }
-
-
-    gallery.innerHTML = "";
-
-
-    for (const memory of data) {
-
-        const card =
-            document.createElement("div");
-
-        card.className =
-            "memory-card";
-
-
-        const title =
-            document.createElement("h2");
-
-        title.textContent =
-            memory.title || "Untitled";
-
-
-        const caption =
-            document.createElement("p");
-
-        caption.textContent =
-            memory.caption || "";
-
-
-        card.appendChild(title);
-
-        card.appendChild(caption);
-
-        gallery.appendChild(card);
-    }
-}
     </script>
 
 </body>
 
-</html>
-                
+</html>    
